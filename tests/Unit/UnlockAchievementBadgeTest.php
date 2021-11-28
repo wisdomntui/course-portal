@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Events\CommentWritten;
-use App\Listeners\HandleCommentWritten;
-use App\Models\Comment;
-use Illuminate\Support\Facades\Log;
+use App\Events\LessonWatched;
+use App\Listeners\HandleLessonWatched;
+use App\Models\Lesson;
+use App\Models\User;
 use Tests\TestCase;
 
 class UnlockAchievementBadgeTest extends TestCase
@@ -27,20 +27,19 @@ class UnlockAchievementBadgeTest extends TestCase
      */
     public function test_it_can_create_comment_achievement_and_badge()
     {
-        try {
-            // Fake a comment object
-            $comment = new Comment();
-            $comment->body = "Hello";
-            $comment->user_id = 1;
+        // Fake a lesson object
+        // $comment = new Comment();
+        // $comment->body = "Hello";
+        // $comment->user_id = 5;
 
-            $listener = new HandleCommentWritten();
+        $user = User::find(5);
+        $lesson = Lesson::find(20);
 
-            $listener->handle(new CommentWritten($comment));
+        $listener = new HandleLessonWatched();
 
-            // Dispatch event
-            CommentWritten::dispatch($comment);
-        } catch (\Throwable $th) {
-            Log::error($th);
-        }
+        $listener->handle(new LessonWatched($lesson, $user));
+
+        // Dispatch event
+        // CommentWritten::dispatch($comment);
     }
 }

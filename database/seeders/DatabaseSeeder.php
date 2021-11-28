@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Achievement;
 use App\Models\Badge;
-use App\Models\Lesson;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,8 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $lessons = Lesson::factory()
-            ->count(20)
+        // $lessons = Lesson::factory()
+        //     ->count(20)
+        //     ->create();
+
+        // Seed users table
+        $user = User::factory()
+            ->count(5)
             ->create();
 
         // Seed Achievements Table

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\AchievementUnlocked;
 use App\Http\Traits\BadgeTrait;
 use App\Models\Achievement;
 use App\Models\User;
@@ -37,19 +38,22 @@ class HandleLessonWatched
 
         // Determine user achievement
         switch ($lessonWatchedCount) {
-            case 0:
-                $this->createUserAchievement($userId, $lessonWatchedCount);
-                break;
-            case 4:
-                $this->createUserAchievement($userId, $lessonWatchedCount);
-                break;
-            case 8:
-                $this->createUserAchievement($userId, $lessonWatchedCount);
+            case 5:
+                $this->createUserAchievement($user, $lessonWatchedCount);
                 break;
             case 10:
-                $this->createUserAchievement($userId, $lessonWatchedCount);
+                $this->createUserAchievement($user, $lessonWatchedCount);
+                break;
+            case 25:
+                $this->createUserAchievement($user, $lessonWatchedCount);
+                break;
+            case 50:
+                $this->createUserAchievement($user, $lessonWatchedCount);
                 break;
         }
+
+        // Create badge
+        $this->createBadge($user);
     }
 
     /**
@@ -59,15 +63,15 @@ class HandleLessonWatched
      * @param  integer  $countCondition
      * @return void
      */
-    private function createUserAchievement($userId, $countCondition)
+    private function createUserAchievement($user, $countCondition)
     {
         // Get achievement with that condition
         $achievement = Achievement::firstWhere([['count_condition', '=', $countCondition], ['type', '=', 'lessons_watched']]);
 
         // Insert data
-        $achievement->users()->sync([$userId]);
+        $achievement->users()->sync([$user->id]);
 
-        // Create badge
-        $this->createBadge($userId);
+        // Dispatch achievement unlocked event
+        AchievementUnlocked::dispatch($achievement->title, $user);
     }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Listeners;
 
+use App\Events\AchievementUnlocked;
 use App\Http\Traits\BadgeTrait;
 use App\Models\Achievement;
 use App\Models\Comment;
+use App\Models\User;
 
 class HandleCommentWritten
 {
@@ -29,29 +31,32 @@ class HandleCommentWritten
     public function handle($event)
     {
         try {
-            $userId = $event->comment->user_id;
+            $user = User::findOrFail($event->comment->user_id);
 
             // Get number of comments
-            $commentCount = Comment::where('user_id', $userId)->count();
-            $commentCount = 1;
+            $commentCount = Comment::where('user_id', $user->id)->count();
+
             // Determine user achievement
             switch ($commentCount) {
                 case 1:
-                    $this->createUserAchievement($userId, $commentCount);
+                    $this->createUserAchievement($user, $commentCount);
                     break;
                 case 3:
-                    $this->createUserAchievement($userId, $commentCount);
+                    $this->createUserAchievement($user, $commentCount);
                     break;
                 case 5:
-                    $this->createUserAchievement($userId, $commentCount);
+                    $this->createUserAchievement($user, $commentCount);
                     break;
                 case 10:
-                    $this->createUserAchievement($userId, $commentCount);
+                    $this->createUserAchievement($user, $commentCount);
                     break;
                 case 20:
-                    $this->createUserAchievement($userId, $commentCount);
+                    $this->createUserAchievement($user, $commentCount);
                     break;
             }
+
+            // Create badge
+            $this->createBadge($user);
         } catch (\Throwable $th) {
             logger($th);
         }
@@ -64,15 +69,15 @@ class HandleCommentWritten
      * @param  integer  $countCondition
      * @return void
      */
-    private function createUserAchievement($userId, $countCondition)
+    private function createUserAchievement($user, $countCondition)
     {
         // Get achievement with that condition
         $achievement = Achievement::firstWhere([['count_condition', '=', $countCondition], ['type', '=', 'comments_written']]);
 
         // Insert data
-        $achievement->users()->sync([$userId]);
+        $achievement->users()->sync([$user->id]);
 
-        // Create badge
-        $this->createBadge($userId);
+        // Dispatch achievement unlocked event
+        AchievementUnlocked::dispatch($achievement->title, $user);
     }
 }
