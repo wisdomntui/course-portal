@@ -15,6 +15,6 @@ class FetchUserAchievementTest extends TestCase
     {
         $response = $this->get('users/5/achievements');
 
-        dd($response->content());
+        $response->assertStatus(200);
     }
 }

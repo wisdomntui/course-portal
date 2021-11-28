@@ -10,17 +10,24 @@ class AchievementsController extends Controller
 {
     public function index($user)
     {
-        $user = User::findOrFail($user);
-        $achievements = $this->unlockedAchievements($user);
-        $badge = $this->badge($user);
+        try {
+            $user = User::findOrFail($user);
 
-        return response()->json([
-            'unlocked_achievements' => $achievements['unlockedAchievements'],
-            'next_available_achievements' => $achievements['nextAchievements'],
-            'current_badge' => $badge['currentBadge'],
-            'next_badge' => $badge['nextBadge'],
-            'remaing_to_unlock_next_badge' => $badge['remaining'],
-        ]);
+            // Achievement and Badge data
+            $achievements = $this->unlockedAchievements($user);
+            $badge = $this->badge($user);
+
+            return response()->json([
+                'unlocked_achievements' => $achievements['unlockedAchievements'],
+                'next_available_achievements' => $achievements['nextAchievements'],
+                'current_badge' => $badge['current'],
+                'next_badge' => $badge['next'],
+                'remaing_to_unlock_next_badge' => $badge['remaining'],
+            ]);
+        } catch (\Throwable $th) {
+            logger($th);
+            return response()->json(['message' => "Oops! There has been an error."], 500);
+        }
     }
 
     /**
@@ -72,7 +79,7 @@ class AchievementsController extends Controller
             // Remaining to unlock
             $remaining = ($nextBadge->achievement_count - $currentBadge->achievement_count);
 
-            return compact('currentBadge', 'nextBadge', 'remaining');
+            return compact('current', 'next', 'remaining');
         } catch (\Throwable $th) {
             logger($th);
             return false;

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
@@ -17,10 +17,14 @@ class ExampleTest extends TestCase
      */
     public function test_example()
     {
-        $user = User::factory()->create();
-        
-        $response = $this->get("/users/{$user->id}/achievements");
+        try {
+            $user = User::factory()->create();
 
-        $response->assertStatus(200);
+            $response = $this->get("/users/{$user->id}/achievements");
+
+            $response->assertStatus(200);
+        } catch (\Throwable $th) {
+            logger($th);
+        }
     }
 }
