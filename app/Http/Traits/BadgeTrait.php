@@ -12,27 +12,35 @@ trait BadgeTrait
      * Create user badge.
      *
      * @param  integer $userId
-     * @return void
+     * @return bool
      */
     public function createBadge($user)
     {
-        // Get number of achievements
-        $achievementCount = UserAchievement::where('user_id', $user->id)->count();
+        try {
+            // Get number of achievements
+            $achievementCount = UserAchievement::where('user_id', $user->id)->count();
 
-        // Determine user achievement
-        switch ($achievementCount) {
-            case 0:
-                $this->storeBadge($user, $achievementCount);
-                break;
-            case 4:
-                $this->storeBadge($user, $achievementCount);
-                break;
-            case 8:
-                $this->storeBadge($user, $achievementCount);
-                break;
-            case 10:
-                $this->storeBadge($user, $achievementCount);
-                break;
+            // Determine user achievement
+            switch ($achievementCount) {
+                case 0:
+                    $this->storeBadge($user, $achievementCount);
+                    break;
+                case 4:
+                    $this->storeBadge($user, $achievementCount);
+                    break;
+                case 8:
+                    $this->storeBadge($user, $achievementCount);
+                    break;
+                case 10:
+                    $this->storeBadge($user, $achievementCount);
+                    break;
+            }
+
+            return true;
+        } catch (\Throwable $th) {
+            logger($th);
+
+            return false;
         }
     }
 

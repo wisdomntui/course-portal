@@ -2,44 +2,26 @@
 
 namespace Tests\Unit;
 
-use App\Events\LessonWatched;
-use App\Listeners\HandleLessonWatched;
-use App\Models\Lesson;
+use App\Http\Traits\AchievementTrait;
+use App\Http\Traits\BadgeTrait;
 use App\Models\User;
 use Tests\TestCase;
 
 class UnlockAchievementBadgeTest extends TestCase
 {
+    use BadgeTrait, AchievementTrait;
+
     /**
-     * A basic unit test example.
+     * Test that it can create user badge.
      *
      * @return void
      */
-    public function test_example()
+    public function test_it_can_create_user_badge()
     {
-        $this->assertTrue(true);
-    }
-
-    /**
-     * Test .
-     *
-     * @return void
-     */
-    public function test_it_can_create_comment_achievement_and_badge()
-    {
-        // Fake a lesson object
-        // $comment = new Comment();
-        // $comment->body = "Hello";
-        // $comment->user_id = 5;
-
         $user = User::find(5);
-        $lesson = Lesson::find(20);
 
-        $listener = new HandleLessonWatched();
+        $state = $this->createBadge($user);
 
-        $listener->handle(new LessonWatched($lesson, $user));
-
-        // Dispatch event
-        // CommentWritten::dispatch($comment);
+        $this->assertTrue($state);
     }
 }
